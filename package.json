@@ -1,0 +1,24 @@
+{
+  "name": "print3d-shop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Persian RTL single-vendor 3D printing e-commerce platform",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "storefront": "cd storefront && npm run dev",
+    "admin": "cd admin-panel && npm run dev",
+    "install:storefront": "cd storefront && npm install",
+    "install:admin": "cd admin-panel && npm install",
+    "install:all": "npm run install:storefront && npm run install:admin",
+    "build:storefront": "cd storefront && npm run build",
+    "build:admin": "cd admin-panel && npm run build",
+    "build:all": "npm run build:storefront && npm run build:admin"
+  },
+  "workspaces": [
+    "storefront",
+    "admin-panel"
+  ]
+}

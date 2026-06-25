@@ -1,0 +1,31 @@
+# =============================================================
+#  print3d-shop — backend tooling config
+# =============================================================
+
+[tool.ruff]
+# Target Python version
+target-version = "py312"
+line-length = 88
+
+# Rules: pycodestyle (E,W) + pyflakes (F) + isort (I)
+select = ["E", "W", "F", "I"]
+ignore = []
+
+exclude = [
+    ".venv",
+    "migrations",
+    "__pycache__",
+]
+
+[tool.ruff.isort]
+known-first-party = ["config", "accounts", "products", "orders"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
