@@ -45,9 +45,9 @@ const clearGuestCart = () => {
 export function CartProvider({ children }) {
   const { isAuthenticated } = useAuth();
 
-  const [cart, setCart]       = useState(null);   // backend cart object
-  const [guestItems, setGuestItems] = useState(getGuestCart); // guest array
-  const [loading, setLoading] = useState(false);
+  const [cart, setCart]             = useState(null);
+  const [guestItems, setGuestItems] = useState(getGuestCart);
+  const [loading, setLoading]       = useState(false);
 
   // ── Fetch backend cart when user logs in ──────────────────
 
@@ -109,7 +109,6 @@ export function CartProvider({ children }) {
       });
       setCart(res.data);
     } else {
-      // Guest — update localStorage
       const items = getGuestCart();
       const existing = items.find((i) => i.product.id === product.id);
       if (existing) {

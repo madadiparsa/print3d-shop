@@ -1,17 +1,42 @@
 // =============================================================
 //  storefront/src/App.jsx
-//  Temporary placeholder — will be replaced in Step 5.4
-//  with React Router and full page structure
+//  Root component — wraps all providers and defines routes
 // =============================================================
+
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
+
+import CartPage          from "./pages/CartPage";
+import CatalogPage       from "./pages/CatalogPage";
+import CheckoutPage      from "./pages/CheckoutPage";
+import HomePage          from "./pages/HomePage";
+import LoginPage         from "./pages/LoginPage";
+import NotFoundPage      from "./pages/NotFoundPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import ProfilePage       from "./pages/ProfilePage";
 
 function App() {
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
-      <div className="text-center">
-        <h1 className="text-primary-brand mb-3">فروشگاه پرینت سه‌بعدی</h1>
-        <p className="text-muted">در حال راه‌اندازی...</p>
-      </div>
-    </div>
+    <BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Routes>
+              <Route path="/"                  element={<HomePage />} />
+              <Route path="/catalog"           element={<CatalogPage />} />
+              <Route path="/products/:slug"    element={<ProductDetailPage />} />
+              <Route path="/cart"              element={<CartPage />} />
+              <Route path="/checkout"          element={<CheckoutPage />} />
+              <Route path="/login"             element={<LoginPage />} />
+              <Route path="/profile"           element={<ProfilePage />} />
+              <Route path="*"                  element={<NotFoundPage />} />
+            </Routes>
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 
