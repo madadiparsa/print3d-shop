@@ -3,27 +3,29 @@
 //  Two-step OTP login:
 //  Step 1 — enter phone number → request OTP
 //  Step 2 — enter 6-digit code → verify and receive JWT
+//  After login — redirects back to the page the user came from
 // =============================================================
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 function LoginPage() {
   const { requestOTP, verifyOTP, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const location  = useLocation();
 
   // ── Steps: "phone" | "code" ───────────────────────────────
-  const [step, setStep]         = useState("phone");
-  const [phone, setPhone]       = useState("");
-  const [code, setCode]         = useState("");
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState("");
+  const [step, setStep]           = useState("phone");
+  const [phone, setPhone]         = useState("");
+  const [code, setCode]           = useState("");
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState("");
   const [countdown, setCountdown] = useState(0);
 
   // Redirect if already logged in
   useEffect(() => {
-    if (isAuthenticated) navigate("/profile");
+    if (isAuthenticated) navigate("/profile", { replace: true });
   }, [isAuthenticated, navigate]);
 
   // ── Countdown timer for OTP resend ────────────────────────
@@ -72,8 +74,13 @@ function LoginPage() {
     setLoading(true);
     try {
       const result = await verifyOTP(phone.trim(), code.trim());
-      // Navigate to profile or back to where they came from
-      navigate(result.created ? "/profile" : "/");
+
+      // Redirect back to where the user came from,
+      // or to /profile on first login, or / on returning login
+      const from = location.state?.from ||
+        (result.created ? "/profile" : "/");
+      navigate(from, { replace: true });
+
     } catch (err) {
       setError(
         err.response?.data?.detail ||
@@ -105,7 +112,7 @@ function LoginPage() {
 
   // ── Format countdown as mm:ss ─────────────────────────────
   const formatCountdown = (s) => {
-    const m = Math.floor(s / 60);
+    const m   = Math.floor(s / 60);
     const sec = s % 60;
     return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   };
@@ -121,7 +128,10 @@ function LoginPage() {
           {/* Header */}
           <div className="text-center mb-4">
             <div style={{ fontSize: "2.5rem" }}>🖨️</div>
-            <h4 className="fw-bold mt-2" style={{ color: "var(--color-text)" }}>
+            <h4
+              className="fw-bold mt-2"
+              style={{ color: "var(--color-text)" }}
+            >
               {step === "phone" ? "ورود به حساب" : "کد تایید"}
             </h4>
             <p className="text-muted" style={{ fontSize: "0.9rem" }}>
@@ -143,7 +153,10 @@ function LoginPage() {
 
           {/* Error */}
           {error && (
-            <div className="alert alert-danger mb-3" style={{ fontSize: "0.85rem" }}>
+            <div
+              className="alert alert-danger mb-3"
+              style={{ fontSize: "0.85rem" }}
+            >
               {error}
             </div>
           )}
@@ -152,10 +165,7 @@ function LoginPage() {
           {step === "phone" && (
             <form onSubmit={handleRequestOTP}>
               <div className="mb-3">
-                <label
-                  htmlFor="phone"
-                  className="form-label fw-semibold"
-                >
+                <label htmlFor="phone" className="form-label fw-semibold">
                   شماره موبایل
                 </label>
                 <input
@@ -176,12 +186,12 @@ function LoginPage() {
                 className="btn btn-primary w-100 btn-lg"
                 disabled={loading}
               >
-                {loading ? (
+                {loading && (
                   <span
                     className="spinner-border spinner-border-sm me-2"
                     role="status"
                   />
-                ) : null}
+                )}
                 {loading ? "در حال ارسال..." : "دریافت کد تایید"}
               </button>
             </form>
@@ -191,10 +201,7 @@ function LoginPage() {
           {step === "code" && (
             <form onSubmit={handleVerifyOTP}>
               <div className="mb-3">
-                <label
-                  htmlFor="code"
-                  className="form-label fw-semibold"
-                >
+                <label htmlFor="code" className="form-label fw-semibold">
                   کد تایید
                 </label>
                 <input
@@ -219,12 +226,12 @@ function LoginPage() {
                 className="btn btn-primary w-100 btn-lg mb-3"
                 disabled={loading || code.length !== 6}
               >
-                {loading ? (
+                {loading && (
                   <span
                     className="spinner-border spinner-border-sm me-2"
                     role="status"
                   />
-                ) : null}
+                )}
                 {loading ? "در حال بررسی..." : "ورود"}
               </button>
 
@@ -257,6 +264,7 @@ function LoginPage() {
               </div>
             </form>
           )}
+
         </div>
       </div>
     </div>
