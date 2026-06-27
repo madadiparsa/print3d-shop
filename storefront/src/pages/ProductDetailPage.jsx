@@ -5,90 +5,12 @@
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import ImageGallery from "../components/ImageGallery";
 import { useCart } from "../contexts/CartContext";
 import api from "../services/api";
 
 const formatPrice = (price) =>
   Number(price).toLocaleString("fa-IR") + " تومان";
-
-// ── Image gallery ─────────────────────────────────────────────
-function ImageGallery({ thumbnail, images, name }) {
-  const allImages = [
-    ...(thumbnail ? [{ id: "thumb", image: thumbnail, alt_text: name }] : []),
-    ...(images || []),
-  ];
-
-  const [active, setActive] = useState(0);
-
-  if (allImages.length === 0) {
-    return (
-      <div
-        className="d-flex align-items-center justify-content-center rounded"
-        style={{
-          height: 360,
-          backgroundColor: "var(--color-border)",
-          fontSize: "5rem",
-        }}
-      >
-        🖨️
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {/* Main image */}
-      <div
-        style={{
-          height: 360,
-          borderRadius: "var(--radius-md)",
-          overflow: "hidden",
-          backgroundColor: "var(--color-border)",
-          marginBottom: "0.75rem",
-        }}
-      >
-        <img
-          src={allImages[active].image}
-          alt={allImages[active].alt_text || name}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
-      </div>
-
-      {/* Thumbnails */}
-      {allImages.length > 1 && (
-        <div className="d-flex gap-2 flex-wrap">
-          {allImages.map((img, idx) => (
-            <button
-              key={img.id}
-              onClick={() => setActive(idx)}
-              style={{
-                width: 72,
-                height: 72,
-                padding: 0,
-                border: `2px solid ${
-                  active === idx
-                    ? "var(--color-primary)"
-                    : "var(--color-border)"
-                }`,
-                borderRadius: "var(--radius-sm)",
-                overflow: "hidden",
-                cursor: "pointer",
-                background: "none",
-                flexShrink: 0,
-              }}
-            >
-              <img
-                src={img.image}
-                alt={img.alt_text || name}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── Skeleton loader ───────────────────────────────────────────
 function ProductDetailSkeleton() {
@@ -96,20 +18,27 @@ function ProductDetailSkeleton() {
     <div className="container py-4">
       <div className="row g-4">
         <div className="col-lg-6">
-          <div className="skeleton" style={{ height: 360, borderRadius: "var(--radius-md)" }} />
+          <div
+            className="skeleton"
+            style={{ height: 380, borderRadius: "var(--radius-md)" }}
+          />
           <div className="d-flex gap-2 mt-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="skeleton" style={{ width: 72, height: 72 }} />
+              <div
+                key={i}
+                className="skeleton"
+                style={{ width: 72, height: 72 }}
+              />
             ))}
           </div>
         </div>
         <div className="col-lg-6">
+          <div className="skeleton mb-2" style={{ height: 20, width: "35%" }} />
           <div className="skeleton mb-3" style={{ height: 36, width: "80%" }} />
-          <div className="skeleton mb-2" style={{ height: 20, width: "40%" }} />
-          <div className="skeleton mb-4" style={{ height: 32, width: "50%" }} />
+          <div className="skeleton mb-4" style={{ height: 32, width: "45%" }} />
           <div className="skeleton mb-2" style={{ height: 16, width: "100%" }} />
           <div className="skeleton mb-2" style={{ height: 16, width: "90%" }} />
-          <div className="skeleton mb-2" style={{ height: 16, width: "80%" }} />
+          <div className="skeleton mb-2" style={{ height: 16, width: "75%" }} />
           <div className="skeleton mt-4" style={{ height: 48, width: "100%" }} />
         </div>
       </div>
@@ -119,9 +48,9 @@ function ProductDetailSkeleton() {
 
 // ── Main component ────────────────────────────────────────────
 function ProductDetailPage() {
-  const { slug }        = useParams();
-  const navigate        = useNavigate();
-  const { addToCart }   = useCart();
+  const { slug }      = useParams();
+  const navigate      = useNavigate();
+  const { addToCart } = useCart();
 
   const [product, setProduct]   = useState(null);
   const [loading, setLoading]   = useState(true);
@@ -191,9 +120,9 @@ function ProductDetailPage() {
     );
   }
 
-  const isCustom  = product.product_type === "custom";
-  const inStock   = product.in_stock;
-  const maxQty    = product.stock || 1;
+  const isCustom = product.product_type === "custom";
+  const inStock  = product.in_stock;
+  const maxQty   = product.stock || 1;
 
   return (
     <div className="container py-4">
@@ -209,7 +138,9 @@ function ProductDetailPage() {
           </li>
           {product.category && (
             <li className="breadcrumb-item">
-              <Link to={`/catalog?category_slug=${product.category.slug}`}>
+              <Link
+                to={`/catalog?category_slug=${product.category.slug}`}
+              >
                 {product.category.name}
               </Link>
             </li>
@@ -248,7 +179,7 @@ function ProductDetailPage() {
                 {product.category.name}
               </span>
             )}
-            {!inStock && (
+            {!inStock && !isCustom && (
               <span className="badge bg-danger">ناموجود</span>
             )}
           </div>
@@ -269,6 +200,14 @@ function ProductDetailPage() {
             >
               {formatPrice(product.price)}
             </span>
+            {isCustom && (
+              <span
+                className="text-muted me-2"
+                style={{ fontSize: "0.85rem" }}
+              >
+                (قیمت پایه — قیمت نهایی پس از هماهنگی)
+              </span>
+            )}
           </div>
 
           {/* Description */}
@@ -287,7 +226,7 @@ function ProductDetailPage() {
             </div>
           )}
 
-          {/* Stock info */}
+          {/* Stock badge for ready-made */}
           {!isCustom && (
             <div className="mb-4">
               <span
@@ -311,7 +250,9 @@ function ProductDetailPage() {
                     <button
                       className="btn btn-outline-secondary"
                       style={{ width: 36, height: 36, padding: 0 }}
-                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      onClick={() =>
+                        setQuantity((q) => Math.max(1, q - 1))
+                      }
                       disabled={quantity <= 1}
                     >
                       −
