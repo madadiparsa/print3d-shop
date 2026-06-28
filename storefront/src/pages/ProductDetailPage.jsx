@@ -1,13 +1,15 @@
 // =============================================================
 //  storefront/src/pages/ProductDetailPage.jsx
 //  Full product detail — images, description, specs, add to cart.
+//  Custom products show the CustomOrderForm instead of cart.
 // =============================================================
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import ImageGallery from "../components/ImageGallery";
-import { useCart } from "../contexts/CartContext";
-import api from "../services/api";
+import CustomOrderForm from "../components/CustomOrderForm";
+import ImageGallery    from "../components/ImageGallery";
+import { useCart }     from "../contexts/CartContext";
+import api             from "../services/api";
 
 const formatPrice = (price) =>
   Number(price).toLocaleString("fa-IR") + " تومان";
@@ -94,10 +96,9 @@ function ProductDetailPage() {
     }
   };
 
-  // ── Loading ───────────────────────────────────────────────
+  // ── States ────────────────────────────────────────────────
   if (loading) return <ProductDetailSkeleton />;
 
-  // ── Error ─────────────────────────────────────────────────
   if (error) {
     return (
       <div className="container py-5">
@@ -127,7 +128,7 @@ function ProductDetailPage() {
   return (
     <div className="container py-4">
 
-      {/* Breadcrumb */}
+      {/* ── Breadcrumb ──────────────────────────────────── */}
       <nav aria-label="breadcrumb" className="mb-3">
         <ol className="breadcrumb">
           <li className="breadcrumb-item">
@@ -298,6 +299,7 @@ function ProductDetailPage() {
                   : "ناموجود"}
               </button>
 
+              {/* Quick actions after adding */}
               {added && (
                 <div className="d-flex gap-2 mt-2">
                   <Link
@@ -317,39 +319,12 @@ function ProductDetailPage() {
             </div>
           )}
 
-          {/* ── Custom product: contact notice ──────────── */}
+          {/* ── Custom product: inline order form ───────── */}
           {isCustom && (
-            <div>
-              <div
-                className="alert alert-warning mb-3"
-                style={{ fontSize: "0.9rem", lineHeight: 1.7 }}
-              >
-                <strong>🎨 محصول سفارشی</strong>
-                <br />
-                این محصول بر اساس مشخصات شما ساخته می‌شود. برای ثبت
-                سفارش و دریافت قیمت نهایی، از طریق تلگرام یا اینستاگرام
-                با فروشگاه تماس بگیرید.
-              </div>
-
-              <div className="d-flex gap-2">
-                <a
-                  href="https://t.me/print3d_shop"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary flex-fill"
-                >
-                  ✈️ تلگرام
-                </a>
-                <a
-                  href="https://instagram.com/print3d.shop"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline-primary flex-fill"
-                >
-                  📸 اینستاگرام
-                </a>
-              </div>
-            </div>
+            <CustomOrderForm
+              productName={product.name}
+              productSlug={product.slug}
+            />
           )}
 
         </div>
