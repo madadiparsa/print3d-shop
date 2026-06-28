@@ -1,0 +1,37 @@
+/* =============================================================
+   admin-panel/src/styles/variables.css
+   ============================================================= */
+
+:root {
+  --font-primary:       "Vazirmatn", system-ui, sans-serif;
+  --color-primary:      #6c3eb3;
+  --color-primary-light:#8b5cd6;
+  --color-accent:       #f59e0b;
+
+  /* Light theme */
+  --color-bg:           #f1f3f9;
+  --color-bg-card:      #ffffff;
+  --color-bg-sidebar:   #1a1a2e;
+  --color-sidebar-text: #c8c8e0;
+  --color-sidebar-active: #6c3eb3;
+  --color-text:         #1a1a2e;
+  --color-text-muted:   #6c757d;
+  --color-border:       #dee2e6;
+  --color-shadow:       rgba(0,0,0,0.08);
+
+  --sidebar-width:      240px;
+  --navbar-height:      60px;
+  --radius-sm:          6px;
+  --radius-md:          10px;
+  --transition-base:    0.25s ease;
+  --transition-fast:    0.15s ease;
+}
+
+[data-theme="dark"] {
+  --color-bg:           #0f0f1a;
+  --color-bg-card:      #1a1a2e;
+  --color-text:         #e8e8f0;
+  --color-text-muted:   #9999b3;
+  --color-border:       #2d2d4a;
+  --color-shadow:       rgba(0,0,0,0.3);
+}
