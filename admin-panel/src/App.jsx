@@ -5,15 +5,18 @@
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute  from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages — shells for now, filled in phases 11 & 12
-import LoginPage    from "./pages/LoginPage";
+import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-import ProductsPage  from "./pages/ProductsPage";
-import OrdersPage    from "./pages/OrdersPage";
-import MessagesPage  from "./pages/MessagesPage";
-import NotFoundPage  from "./pages/NotFoundPage";
+import ProductsPage from "./pages/ProductsPage";
+import OrdersPage from "./pages/OrdersPage";
+import MessagesPage from "./pages/MessagesPage";
+import NotFoundPage from "./pages/NotFoundPage";
+
+import ProductFormPage from "./pages/ProductFormPage";
+import CategoriesPage from "./pages/CategoriesPage";
 
 function App() {
   return (
@@ -38,6 +41,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProductsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/new"
+            element={
+              <ProtectedRoute>
+                <ProductFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/:slug/edit"
+            element={
+              <ProtectedRoute>
+                <ProductFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute>
+                <CategoriesPage />
               </ProtectedRoute>
             }
           />
