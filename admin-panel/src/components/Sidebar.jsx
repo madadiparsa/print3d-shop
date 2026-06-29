@@ -1,19 +1,20 @@
 // =============================================================
 //  admin-panel/src/components/Sidebar.jsx
-//  Fixed right-side navigation sidebar.
 // =============================================================
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 const NAV_ITEMS = [
-  { to: "/",         icon: "📊", label: "داشبورد"       },
-  { to: "/products", icon: "🖨️", label: "محصولات"       },
-  { to: "/orders",   icon: "📦", label: "سفارش‌ها"      },
-  { to: "/messages", icon: "✉️", label: "پیام‌ها"        },
+  { to: "/",         icon: "📊", label: "داشبورد"  },
+  { to: "/products", icon: "🖨️", label: "محصولات"  },
+  { to: "/orders",   icon: "📦", label: "سفارش‌ها" },
+  { to: "/messages", icon: "✉️", label: "پیام‌ها"   },
 ];
 
-function Sidebar({ collapsed, onClose }) {
+const SIDEBAR_WIDTH = 240;
+
+function Sidebar({ open, onClose }) {
   const { user, logout } = useAuth();
   const navigate         = useNavigate();
 
@@ -23,93 +24,147 @@ function Sidebar({ collapsed, onClose }) {
   };
 
   return (
-    <>
-      {/* Mobile backdrop */}
-      {!collapsed && (
-        <div
-          className="sidebar-overlay visible d-lg-none"
-          onClick={onClose}
-        />
-      )}
-
-      <aside
-        className={`admin-sidebar ${collapsed ? "collapsed" : ""}`}
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        right: 0,
+        width: SIDEBAR_WIDTH,
+        height: "100vh",
+        backgroundColor: "#1a1a2e",
+        display: "flex",
+        flexDirection: "column",
+        zIndex: 1020,
+        transform: "translateX(0)",
+        transition: "transform 0.25s ease",
+        overflowY: "auto",
+      }}
+      className={`admin-sidebar-inner ${open ? "sidebar-open" : ""}`}
+    >
+      {/* Logo */}
+      <div
+        style={{
+          padding: "1rem 1.25rem",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
       >
-        {/* ── Logo ──────────────────────────────────────── */}
-        <div
-          className="d-flex align-items-center justify-content-between px-3 py-3"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span style={{ fontSize: "1.4rem" }}>🖨️</span>
+          <span style={{ color: "#fff", fontWeight: 700, fontSize: "1rem" }}>
+            پنل مدیریت
+          </span>
+        </div>
+        <button
+          className="d-lg-none"
+          onClick={onClose}
+          style={{
+            background: "none",
+            border: "none",
+            color: "rgba(255,255,255,0.6)",
+            fontSize: "1.1rem",
+            cursor: "pointer",
+          }}
         >
-          <div className="d-flex align-items-center gap-2">
-            <span style={{ fontSize: "1.4rem" }}>🖨️</span>
-            <span
-              className="fw-bold"
-              style={{ color: "#fff", fontSize: "1rem" }}
-            >
-              پنل مدیریت
-            </span>
-          </div>
-          <button
-            className="btn btn-sm d-lg-none"
-            style={{ color: "rgba(255,255,255,0.6)", background: "none" }}
+          ✕
+        </button>
+      </div>
+
+      {/* Nav items */}
+      <nav style={{ flexGrow: 1, padding: "0.5rem 0" }}>
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === "/"}
             onClick={onClose}
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* ── Nav items ─────────────────────────────────── */}
-        <nav className="flex-grow-1 py-2">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
+            style={({ isActive }) => ({
+              display: "flex",
+              alignItems: "center",
+              gap: "0.6rem",
+              padding: "0.65rem 1.25rem",
+              margin: "2px 8px",
+              borderRadius: 6,
+              color: isActive ? "#fff" : "#c8c8e0",
+              backgroundColor: isActive
+                ? "var(--color-primary, #6c3eb3)"
+                : "transparent",
+              textDecoration: "none",
+              fontSize: "0.9rem",
+              transition: "background-color 0.15s ease",
+            })}
+            onMouseEnter={(e) => {
+              if (!e.currentTarget.classList.contains("active")) {
+                e.currentTarget.style.backgroundColor =
+                  "rgba(255,255,255,0.08)";
               }
-              onClick={onClose}
-            >
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* ── User info + logout ─────────────────────────── */}
-        <div
-          style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}
-          className="p-3"
-        >
-          {user && (
-            <div className="mb-2">
-              <p
-                className="mb-0 fw-semibold"
-                style={{ color: "#fff", fontSize: "0.85rem" }}
-              >
-                {user.full_name || "ادمین"}
-              </p>
-              <p
-                className="mb-0"
-                style={{
-                  color: "rgba(255,255,255,0.5)",
-                  fontSize: "0.75rem",
-                }}
-                dir="ltr"
-              >
-                {user.phone}
-              </p>
-            </div>
-          )}
-          <button
-            className="btn btn-sm btn-outline-danger w-100"
-            onClick={handleLogout}
+            }}
+            onMouseLeave={(e) => {
+              if (!e.currentTarget.classList.contains("active")) {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }
+            }}
           >
-            خروج
-          </button>
-        </div>
-      </aside>
-    </>
+            <span>{item.icon}</span>
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* User + logout */}
+      <div
+        style={{
+          padding: "1rem",
+          borderTop: "1px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        {user && (
+          <div style={{ marginBottom: "0.5rem" }}>
+            <p
+              style={{
+                color: "#fff",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                margin: 0,
+              }}
+            >
+              {user.full_name || "ادمین"}
+            </p>
+            <p
+              style={{
+                color: "rgba(255,255,255,0.45)",
+                fontSize: "0.75rem",
+                margin: 0,
+                direction: "ltr",
+                textAlign: "right",
+              }}
+            >
+              {user.phone}
+            </p>
+          </div>
+        )}
+        <button
+          className="btn btn-sm btn-outline-danger w-100"
+          onClick={handleLogout}
+        >
+          خروج
+        </button>
+      </div>
+
+      {/* Mobile hide when closed */}
+      <style>{`
+        @media (max-width: 991.98px) {
+          .admin-sidebar-inner {
+            transform: translateX(100%) !important;
+          }
+          .admin-sidebar-inner.sidebar-open {
+            transform: translateX(0) !important;
+          }
+        }
+      `}</style>
+    </div>
   );
 }
 

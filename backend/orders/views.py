@@ -43,12 +43,8 @@ class CartView(APIView):
 class CartItemAddView(APIView):
     """
     POST /api/orders/cart/items/
-
     Add a product to the cart.
     If the product is already in the cart, increase its quantity.
-
-    Request body:
-      { "product_id": 1, "quantity": 2 }
     """
 
     permission_classes = [permissions.IsAuthenticated]
@@ -57,21 +53,17 @@ class CartItemAddView(APIView):
         serializer = CartItemSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        product = serializer.validated_data["product"]
+        product  = serializer.validated_data["product"]
         quantity = serializer.validated_data["quantity"]
 
-        # Check stock availability
         if product.stock < quantity:
             return Response(
-                {
-                    "detail": f"موجودی کافی نیست. حداکثر {product.stock} عدد موجود است."
-                },
+                {"detail": f"موجودی کافی نیست. حداکثر {product.stock} عدد موجود است."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         cart, _ = Cart.objects.get_or_create(user=request.user)
 
-        # If product already in cart — increase quantity
         cart_item, created = CartItem.objects.get_or_create(
             cart=cart,
             product=product,
@@ -94,12 +86,8 @@ class CartItemAddView(APIView):
             cart_item.quantity = new_quantity
             cart_item.save(update_fields=["quantity"])
 
-        # Return the updated full cart
         cart_serializer = CartSerializer(cart)
-        return Response(
-            cart_serializer.data,
-            status=status.HTTP_200_OK,
-        )
+        return Response(cart_serializer.data, status=status.HTTP_200_OK)
 
 
 class CartItemUpdateView(APIView):
@@ -111,12 +99,8 @@ class CartItemUpdateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_cart_item(self, request, pk):
-        """Return cart item only if it belongs to the current user's cart."""
         try:
-            return CartItem.objects.get(
-                pk=pk,
-                cart__user=request.user,
-            )
+            return CartItem.objects.get(pk=pk, cart__user=request.user)
         except CartItem.DoesNotExist:
             return None
 
@@ -151,19 +135,13 @@ class CartItemUpdateView(APIView):
 
         if quantity > cart_item.product.stock:
             return Response(
-                {
-                    "detail": (
-                        f"موجودی کافی نیست. "
-                        f"حداکثر {cart_item.product.stock} عدد موجود است."
-                    )
-                },
+                {"detail": f"موجودی کافی نیست. حداکثر {cart_item.product.stock} عدد موجود است."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         cart_item.quantity = quantity
         cart_item.save(update_fields=["quantity"])
 
-        # Return the updated full cart
         cart_serializer = CartSerializer(cart_item.cart)
         return Response(cart_serializer.data)
 
@@ -178,7 +156,6 @@ class CartItemUpdateView(APIView):
         cart = cart_item.cart
         cart_item.delete()
 
-        # Return the updated full cart
         cart_serializer = CartSerializer(cart)
         return Response(cart_serializer.data)
 
@@ -209,7 +186,7 @@ class OrderListView(generics.ListAPIView):
     Staff users see all orders.
     """
 
-    serializer_class = OrderSerializer
+    serializer_class   = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -223,21 +200,7 @@ class OrderListView(generics.ListAPIView):
 class OrderCreateView(APIView):
     """
     POST /api/orders/create/
-
     Submit a new order from the current cart.
-
-    - Cart must not be empty
-    - Creates OrderItems as snapshots of current product prices
-    - Clears the cart after successful order creation
-    - Customer provides Telegram or Instagram ID for manual coordination
-
-    Request body:
-      {
-        "contact_method": "telegram",
-        "contact_id": "@myusername",
-        "delivery_address": "تهران، خیابان ولیعصر...",
-        "notes": "لطفاً زودتر ارسال شود"
-      }
     """
 
     permission_classes = [permissions.IsAuthenticated]
@@ -246,7 +209,6 @@ class OrderCreateView(APIView):
         serializer = OrderCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Get the user's cart
         try:
             cart = Cart.objects.prefetch_related(
                 "items__product"
@@ -257,28 +219,24 @@ class OrderCreateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Cart must not be empty
         if not cart.items.exists():
             return Response(
                 {"detail": "سبد خرید خالی است."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Verify all items are still in stock
         for item in cart.items.all():
             if item.product.stock < item.quantity:
                 return Response(
                     {
                         "detail": (
-                            f"موجودی محصول «{item.product.name}» "
-                            f"کافی نیست. "
+                            f"موجودی محصول «{item.product.name}» کافی نیست. "
                             f"موجودی فعلی: {item.product.stock} عدد."
                         )
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        # Create the order
         order = Order.objects.create(
             user=request.user,
             contact_method=serializer.validated_data["contact_method"],
@@ -287,7 +245,6 @@ class OrderCreateView(APIView):
             notes=serializer.validated_data.get("notes", ""),
         )
 
-        # Create order item snapshots
         for item in cart.items.all():
             OrderItem.objects.create(
                 order=order,
@@ -297,10 +254,7 @@ class OrderCreateView(APIView):
                 quantity=item.quantity,
             )
 
-        # Calculate and save the total
         order.calculate_total()
-
-        # Clear the cart
         cart.items.all().delete()
 
         logger.info(
@@ -320,11 +274,9 @@ class OrderDetailView(generics.RetrieveAPIView):
     """
     GET /api/orders/<id>/
     Returns full detail of a single order.
-    Users can only view their own orders.
-    Staff can view any order.
     """
 
-    serializer_class = OrderSerializer
+    serializer_class   = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -339,9 +291,6 @@ class OrderStatusUpdateView(APIView):
     """
     PATCH /api/orders/<id>/status/
     Admin-only — update order status and admin notes.
-
-    Request body:
-      { "status": "confirmed", "admin_notes": "پرداخت تایید شد" }
     """
 
     permission_classes = [permissions.IsAdminUser]
@@ -367,19 +316,36 @@ class OrderStatusUpdateView(APIView):
 
 
 # =============================================================
-#  Contact Message View
+#  Contact Message Views
 # =============================================================
 
 class ContactMessageView(APIView):
     """
     POST /api/orders/contact/
     Submit a support message from the storefront contact form.
-    No authentication required.
+    Public endpoint — no auth required.
+
+    GET /api/orders/contact/
+    List all contact messages — staff only.
     """
 
-    permission_classes = [permissions.AllowAny]
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
+
+    def get(self, request):
+        """Admin only — list all contact messages."""
+        messages = ContactMessage.objects.all().order_by("-created_at")
+        serializer = ContactMessageSerializer(messages, many=True)
+        # Wrap in DRF-style paginated response for consistency
+        return Response({
+            "count":   messages.count(),
+            "results": serializer.data,
+        })
 
     def post(self, request):
+        """Public — submit a contact message."""
         serializer = ContactMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -387,3 +353,27 @@ class ContactMessageView(APIView):
             {"detail": "پیام شما با موفقیت ارسال شد. به زودی با شما تماس می‌گیریم."},
             status=status.HTTP_201_CREATED,
         )
+
+
+class ContactMessageMarkReadView(APIView):
+    """
+    PATCH /api/orders/contact/<id>/read/
+    Admin only — mark a message as read.
+    """
+
+    permission_classes = [permissions.IsAdminUser]
+
+    def patch(self, request, pk):
+        try:
+            message = ContactMessage.objects.get(pk=pk)
+        except ContactMessage.DoesNotExist:
+            return Response(
+                {"detail": "پیام یافت نشد."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        message.is_read = not message.is_read
+        message.save(update_fields=["is_read"])
+
+        serializer = ContactMessageSerializer(message)
+        return Response(serializer.data)

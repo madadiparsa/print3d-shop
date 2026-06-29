@@ -2,7 +2,6 @@
    admin-panel/src/styles/global.css
    ============================================================= */
 
-
 @font-face {
   font-family: "Vazirmatn";
   src: url("/fonts/Vazirmatn-RD[wght].woff2") format("woff2-variations");
@@ -10,7 +9,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 
 @import "bootstrap/dist/css/bootstrap.rtl.min.css";
 @import "./variables.css";
@@ -76,22 +74,28 @@ a {
   --bs-table-border-color: var(--color-border);
 }
 
+/* ── Admin layout wrapper ──────────────────── */
+.admin-wrapper {
+  display: flex;
+  flex-direction: row-reverse; /* RTL: sidebar on right */
+  min-height: 100vh;
+}
+
 /* ── Admin sidebar ─────────────────────────── */
 .admin-sidebar {
   width: var(--sidebar-width);
   min-height: 100vh;
   background-color: var(--color-bg-sidebar);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
   position: fixed;
   top: 0;
   right: 0;
   z-index: 1020;
-  display: flex;
-  flex-direction: column;
   transition: transform var(--transition-base);
 }
-.admin-sidebar.collapsed {
-  transform: translateX(100%);
-}
+
 .admin-sidebar .nav-link {
   color: var(--color-sidebar-text);
   padding: 0.65rem 1.25rem;
@@ -114,14 +118,12 @@ a {
 
 /* ── Admin main content ────────────────────── */
 .admin-main {
-  margin-right: var(--sidebar-width);
+  flex: 1;
+  min-width: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  transition: margin-right var(--transition-base);
-}
-.admin-main.expanded {
-  margin-right: 0;
+  margin-right: var(--sidebar-width);
 }
 
 /* ── Admin topbar ──────────────────────────── */
@@ -145,19 +147,24 @@ a {
   background-color: var(--color-bg-card);
   box-shadow: 0 2px 8px var(--color-shadow);
   border: 1px solid var(--color-border);
+  height: 100%;
 }
 .stat-card .stat-icon {
   font-size: 2rem;
   margin-bottom: 0.5rem;
+  display: block;
 }
 .stat-card .stat-value {
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--color-primary);
+  display: block;
 }
 .stat-card .stat-label {
   font-size: 0.85rem;
   color: var(--color-text-muted);
+  margin-top: 0.25rem;
+  display: block;
 }
 
 /* ── Skeleton ──────────────────────────────── */
@@ -165,7 +172,7 @@ a {
   background: linear-gradient(
     90deg,
     var(--color-border) 25%,
-    var(--color-bg) 50%,
+    var(--color-bg)     50%,
     var(--color-border) 75%
   );
   background-size: 200% 100%;
@@ -193,7 +200,27 @@ a {
 }
 .sidebar-overlay.visible { display: block; }
 
+/* ── Responsive ────────────────────────────── */
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    transform: translateX(100%);
+  }
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+  .admin-main {
+    margin-right: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .admin-sidebar {
+    transform: translateX(0) !important;
+  }
+}
+
 /* ── Scrollbar ─────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar        { width: 6px; }
+::-webkit-scrollbar-track  { background: var(--color-bg); }
+::-webkit-scrollbar-thumb  { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }

@@ -1,6 +1,5 @@
 // =============================================================
 //  admin-panel/src/components/AdminLayout.jsx
-//  Wraps all admin pages with sidebar + topbar.
 // =============================================================
 
 import { useState } from "react";
@@ -11,25 +10,55 @@ function AdminLayout({ children, title = "" }) {
   const { user }                      = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  return (
-    <div style={{ minHeight: "100vh" }}>
+  const SIDEBAR_WIDTH = 240;
 
-      {/* Sidebar */}
+  return (
+    <div style={{ minHeight: "100vh", backgroundColor: "var(--color-bg)" }}>
+
+      {/* ── Fixed sidebar ───────────────────────────────── */}
       <Sidebar
-        collapsed={!sidebarOpen}
+        open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* Main content */}
-      <div
-        className="admin-main"
-        style={{
-          marginRight: "var(--sidebar-width)",
-        }}
-      >
-        {/* ── Topbar ──────────────────────────────────── */}
-        <header className="admin-topbar">
+      {/* ── Mobile backdrop ─────────────────────────────── */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 1015,
+          }}
+        />
+      )}
 
+      {/* ── Main area — offset from sidebar ─────────────── */}
+      <div
+        style={{
+          marginRight: SIDEBAR_WIDTH,
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        className="admin-main-content"
+      >
+        {/* Topbar */}
+        <header
+          style={{
+            height: 60,
+            backgroundColor: "var(--color-bg-card)",
+            borderBottom: "1px solid var(--color-border)",
+            display: "flex",
+            alignItems: "center",
+            padding: "0 1.5rem",
+            position: "sticky",
+            top: 0,
+            zIndex: 100,
+            gap: "1rem",
+          }}
+        >
           {/* Mobile hamburger */}
           <button
             className="btn btn-sm btn-outline-secondary d-lg-none"
@@ -38,7 +67,6 @@ function AdminLayout({ children, title = "" }) {
             ☰
           </button>
 
-          {/* Page title */}
           <h5
             className="fw-bold mb-0 flex-grow-1"
             style={{ color: "var(--color-text)" }}
@@ -46,13 +74,13 @@ function AdminLayout({ children, title = "" }) {
             {title}
           </h5>
 
-          {/* User badge */}
           {user && (
             <span
               className="badge"
               style={{
                 backgroundColor: "var(--color-primary)",
                 fontSize: "0.8rem",
+                padding: "0.4rem 0.75rem",
               }}
             >
               👤 {user.full_name || user.phone}
@@ -60,21 +88,18 @@ function AdminLayout({ children, title = "" }) {
           )}
         </header>
 
-        {/* ── Page content ────────────────────────────── */}
-        <div className="p-4">
+        {/* Page content */}
+        <div style={{ padding: "1.5rem", flexGrow: 1 }}>
           {children}
         </div>
       </div>
 
-      {/* Fix sidebar on desktop — always visible */}
+      {/* Responsive: remove margin on mobile */}
       <style>{`
-        @media (min-width: 992px) {
-          .admin-sidebar { transform: translateX(0) !important; }
-        }
-        @media (max-width: 991px) {
-          .admin-main { margin-right: 0 !important; }
-          .admin-sidebar { transform: translateX(100%); }
-          .admin-sidebar:not(.collapsed) { transform: translateX(0); }
+        @media (max-width: 991.98px) {
+          .admin-main-content {
+            margin-right: 0 !important;
+          }
         }
       `}</style>
     </div>
