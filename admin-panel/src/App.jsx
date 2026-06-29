@@ -1,25 +1,101 @@
+// =============================================================
+//  admin-panel/src/App.jsx
+//  Root component — router + auth provider + routes
+// =============================================================
+import OrderDetailPage from "./pages/OrderDetailPage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { AuthProvider }  from "./contexts/AuthContext";
-import ProtectedRoute    from "./components/ProtectedRoute";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-import LoginPage     from "./pages/LoginPage";
+// Pages — shells for now, filled in phases 11 & 12
+import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-import ProductsPage  from "./pages/ProductsPage";
-import OrdersPage    from "./pages/OrdersPage";
-import MessagesPage  from "./pages/MessagesPage";
-import NotFoundPage  from "./pages/NotFoundPage";
+import ProductsPage from "./pages/ProductsPage";
+import OrdersPage from "./pages/OrdersPage";
+import MessagesPage from "./pages/MessagesPage";
+import NotFoundPage from "./pages/NotFoundPage";
+
+import ProductFormPage from "./pages/ProductFormPage";
+import CategoriesPage from "./pages/CategoriesPage";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+
+          {/* Public */}
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
-          <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
-          <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+
+          {/* Protected */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <ProductsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/new"
+            element={
+              <ProtectedRoute>
+                <ProductFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/:slug/edit"
+            element={
+              <ProtectedRoute>
+                <ProductFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute>
+                <CategoriesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrdersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders/:id"
+            element={
+              <ProtectedRoute>
+                <OrderDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <MessagesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
+
         </Routes>
       </AuthProvider>
     </BrowserRouter>
