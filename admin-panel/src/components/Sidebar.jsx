@@ -6,10 +6,11 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 const NAV_ITEMS = [
-  { to: "/",         icon: "📊", label: "داشبورد"  },
-  { to: "/products", icon: "🖨️", label: "محصولات"  },
-  { to: "/orders",   icon: "📦", label: "سفارش‌ها" },
-  { to: "/messages", icon: "✉️", label: "پیام‌ها"   },
+  { to: "/",           icon: "📊", label: "داشبورد"       },
+  { to: "/products",   icon: "🖨️", label: "محصولات"       },
+  { to: "/categories", icon: "🗂️", label: "دسته‌بندی‌ها" },
+  { to: "/orders",     icon: "📦", label: "سفارش‌ها"      },
+  { to: "/messages",   icon: "✉️", label: "پیام‌ها"        },
 ];
 
 const SIDEBAR_WIDTH = 240;
