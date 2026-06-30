@@ -10,10 +10,10 @@ import { useCart } from "../contexts/CartContext";
 import { useTheme } from "../contexts/ThemeContext";
 
 function Navbar() {
-  const { theme, toggleTheme }     = useTheme();
+  const { theme, toggleTheme }      = useTheme();
   const { isAuthenticated, logout } = useAuth();
-  const { totalItems }             = useCart();
-  const navigate                   = useNavigate();
+  const { totalItems }              = useCart();
+  const navigate                    = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -33,14 +33,21 @@ function Navbar() {
   return (
     <nav
       className="navbar navbar-expand-lg fixed-top"
-      style={{ zIndex: 1030 }}
+      style={{
+        backgroundColor: "var(--color-bg-navbar)",
+        borderBottom: "1px solid var(--color-border)",
+        height: "var(--navbar-height)",
+        zIndex: 1030,
+        transition: "background-color var(--transition-base)",
+      }}
     >
       <div className="container">
 
         {/* ── Logo ─────────────────────────────────────────── */}
         <Link
-          className="navbar-brand fw-bold text-primary-brand fs-4"
+          className="navbar-brand fw-bold fs-4"
           to="/"
+          style={{ color: "var(--color-primary)" }}
         >
           🖨️ پرینت سه‌بعدی
         </Link>
@@ -53,7 +60,6 @@ function Navbar() {
           data-bs-target="#navbarMain"
           aria-controls="navbarMain"
           aria-expanded="false"
-          aria-label="Toggle navigation"
         >
           <span className="navbar-toggler-icon" />
         </button>
@@ -61,7 +67,7 @@ function Navbar() {
         {/* ── Collapsible content ───────────────────────────── */}
         <div className="collapse navbar-collapse" id="navbarMain">
 
-          {/* ── Search bar ─────────────────────────────────── */}
+          {/* Search */}
           <form
             className="d-flex mx-auto"
             style={{ width: "100%", maxWidth: 400 }}
@@ -74,24 +80,22 @@ function Navbar() {
                 placeholder="جستجوی محصول..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="جستجو"
               />
-              <button
-                className="btn btn-primary"
-                type="submit"
-                aria-label="جستجو"
-              >
+              <button className="btn btn-primary" type="submit">
                 🔍
               </button>
             </div>
           </form>
 
-          {/* ── Right-side actions ───────────────────────────── */}
+          {/* Right actions */}
           <ul className="navbar-nav me-auto mb-2 mb-lg-0 align-items-center gap-2 mt-3 mt-lg-0">
 
-            {/* Catalog link */}
             <li className="nav-item">
-              <Link className="nav-link" to="/catalog">
+              <Link
+                className="nav-link"
+                to="/catalog"
+                style={{ color: "var(--color-text)" }}
+              >
                 محصولات
               </Link>
             </li>
@@ -99,8 +103,19 @@ function Navbar() {
             {/* Theme toggle */}
             <li className="nav-item">
               <button
-                className="btn btn-sm btn-outline-secondary"
+                className="btn btn-sm"
                 onClick={toggleTheme}
+                style={{
+                  backgroundColor: "var(--color-bg-card)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                  borderRadius: "var(--radius-sm)",
+                  width: 36,
+                  height: 36,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
                 title={theme === "light" ? "حالت تاریک" : "حالت روشن"}
               >
                 {theme === "light" ? "🌙" : "☀️"}
@@ -112,7 +127,7 @@ function Navbar() {
               <Link
                 className="nav-link position-relative"
                 to="/cart"
-                aria-label="سبد خرید"
+                style={{ color: "var(--color-text)" }}
               >
                 🛒
                 {totalItems > 0 && (
@@ -127,19 +142,26 @@ function Navbar() {
                 <button
                   className="btn btn-sm btn-outline-primary dropdown-toggle"
                   data-bs-toggle="dropdown"
-                  aria-expanded="false"
                 >
                   👤 حساب من
                 </button>
-                <ul className="dropdown-menu dropdown-menu-end">
+                <ul
+                  className="dropdown-menu dropdown-menu-end"
+                  style={{
+                    backgroundColor: "var(--color-bg-card)",
+                    borderColor: "var(--color-border)",
+                  }}
+                >
                   <li>
-                    <Link className="dropdown-item" to="/profile">
+                    <Link
+                      className="dropdown-item"
+                      to="/profile"
+                      style={{ color: "var(--color-text)" }}
+                    >
                       پروفایل
                     </Link>
                   </li>
-                  <li>
-                    <hr className="dropdown-divider" />
-                  </li>
+                  <li><hr className="dropdown-divider" /></li>
                   <li>
                     <button
                       className="dropdown-item text-danger"
