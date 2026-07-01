@@ -1,6 +1,6 @@
 // =============================================================
 //  storefront/src/App.jsx
-//  Root component — providers, router, protected routes
+//  Root component — providers, router, layout with footer
 // =============================================================
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -9,6 +9,7 @@ import { CartProvider }  from "./contexts/CartContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
 import Navbar         from "./components/Navbar";
+import Footer         from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import CartPage              from "./pages/CartPage";
@@ -27,60 +28,64 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <CartProvider>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh",
+              }}
+            >
+              {/* Navbar on all pages */}
+              <Navbar />
 
-            {/* Navbar shown on all pages */}
-            <Navbar />
+              {/* Main content */}
+              <main
+                className="page-wrapper"
+                style={{ flex: 1 }}
+              >
+                <Routes>
 
-            {/* Main content pushed below fixed navbar */}
-            <main className="page-wrapper">
-              <Routes>
+                  {/* Public */}
+                  <Route path="/"               element={<HomePage />} />
+                  <Route path="/catalog"        element={<CatalogPage />} />
+                  <Route path="/products/:slug" element={<ProductDetailPage />} />
+                  <Route path="/login"          element={<LoginPage />} />
 
-                {/* ── Public routes ─────────────────────── */}
-                <Route path="/"               element={<HomePage />} />
-                <Route path="/catalog"        element={<CatalogPage />} />
-                <Route path="/products/:slug" element={<ProductDetailPage />} />
-                <Route path="/login"          element={<LoginPage />} />
+                  {/* Protected */}
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute><ProfilePage /></ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/cart"
+                    element={
+                      <ProtectedRoute><CartPage /></ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/checkout"
+                    element={
+                      <ProtectedRoute><CheckoutPage /></ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/order-confirmation"
+                    element={
+                      <ProtectedRoute><OrderConfirmationPage /></ProtectedRoute>
+                    }
+                  />
 
-                {/* ── Protected routes ──────────────────── */}
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <ProfilePage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/cart"
-                  element={
-                    <ProtectedRoute>
-                      <CartPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/checkout"
-                  element={
-                    <ProtectedRoute>
-                      <CheckoutPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/order-confirmation"
-                  element={
-                    <ProtectedRoute>
-                      <OrderConfirmationPage />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* 404 */}
+                  <Route path="*" element={<NotFoundPage />} />
 
-                {/* ── 404 ───────────────────────────────── */}
-                <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </main>
 
-              </Routes>
-            </main>
-
+              {/* Footer on all pages */}
+              <Footer />
+            </div>
           </CartProvider>
         </AuthProvider>
       </ThemeProvider>
